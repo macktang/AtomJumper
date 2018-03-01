@@ -1,3 +1,10 @@
+'''
+Mack Tang
+Final Project
+This project is a jumping platformer game that is planned
+to be playable by humans and machine learning
+'''
+
 import pygame as pg
 import settings
 from inputs.joystick import Joysticks
@@ -8,7 +15,17 @@ from plat import Plat
 
 import random
 
+
+# The game class is used to take off some of the work from
+# the code in __main.py__, and is the highest hierarchy class.
+# The game class holds all pygame classes, platform class, and
+# player class.
 class Game():
+
+    #Game Constructor
+    # initializes pygame, game window size
+    # clock, instantiates joystick class,
+    # sets screen size
     def __init__(self):
 
         pg.init()
@@ -18,42 +35,26 @@ class Game():
         self.screen = pg.display.set_mode(self.size)
         self.running = True
 
+    # instantiates sprite groups
+    # instantiates player
+    # generates first gate
     def new(self):
         self.all_sprites = pg.sprite.Group()
         self.platforms = pg.sprite.Group()
         self.player = Player(settings.GAME_WIDTH, settings.GAME_HEIGHT)
         self.all_sprites.add(self.player)
 
-        # for platform in settings.PLATFORM_LIST:
-        #     p = Plat(*platform)
-        #     self.all_sprites.add(p)
-        #     self.platforms.add(p)
-
-        # self.gateStart = random.randrange(20,settings.GAME_WIDTH - 20 - settings.GATE_WIDTH)
         self.lastGate = -50
         self.GateCount = 0
 
         self.generateGate(-50)
         self.generateGate(-50-settings.GAME_WIDTH)
-        # self.generateGate(-50-settings.GAME_WIDTH-settings.GAME_WIDTH)
 
-        # p1 = Plat(0,-50,self.gateStart, 25)
-        # self.platforms.add(p1)
-        # self.all_sprites.add(p1)
-        #
-        # p2 = Plat(self.gateStart+settings.GATE_WIDTH, -50,
-        #           settings.GAME_WIDTH - settings.GATE_WIDTH - self.gateStart, 25)
-        # self.platforms.add(p2)
-        # self.all_sprites.add(p2)
-
-        # p1 = Plat(0,settings.GAME_HEIGHT-40,settings.GAME_WIDTH, 30)
-        # self.platforms.add(p1)
-        # self.all_sprites.add(p1)
-        #
-        # p2 = Plat(settings.GAME_WIDTH * 3/4,settings.GAME_HEIGHT/2, 200, 30)
-        # self.platforms.add(p2)
-        # self.all_sprites.add(p2)
-
+    # the main game loop
+    # reads in keyboard events
+    # updates all sprites
+    # draws all sprites
+    # ticks game clock
     def run(self):
         self.playing = True
         while self.playing:
@@ -62,17 +63,16 @@ class Game():
             self.draw()
             self.clock.tick(settings.FPS)
 
+    # game update function
+    # updates all sprites, checks for collisions
+    # scrolls window, deletes old gates
     def update(self):
         self.all_sprites.update()
         hits = pg.sprite.spritecollide(self.player, self.platforms, False)
 
         if hits:
-            # self.player.rect.midbottom[1] = hits[0].rect.top + 1
-            # self.player.rect.midbottom[0] = hits[0].rect.top
             self.player.pos.y = hits[0].rect.top + 1
             self.player.vel.y = 0
-            # print hits[0].rect.top
-            # print hits[0].rect.top + 1
 
         if self.player.rect.top <= settings.GAME_HEIGHT / 2:
             self.player.pos.y += abs(self.player.vel.y)
@@ -86,7 +86,8 @@ class Game():
 
                     print self.GateCount
 
-
+    # input: offset to generate gate at
+    # this function generates a gate at the specified location
     def generateGate(self, offset):
 
         randomGateStart = random.randrange(20, settings.GAME_WIDTH - 20 - settings.GATE_WIDTH)
@@ -103,7 +104,9 @@ class Game():
         print self.GateCount
 
 
-
+    # function reads in events
+    # such as keyboard presses
+    # or joystick moves and reacts to these events
     def events(self):
         events = pg.event.get()
         for event in events:
@@ -114,6 +117,8 @@ class Game():
                 self.running = False
                 # sys.exit()
 
+    # draws screen background,
+    # sprites, and renders display
     def draw(self):
         self.screen.fill(settings.GRAY)
 

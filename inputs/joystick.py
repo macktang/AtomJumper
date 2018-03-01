@@ -30,8 +30,3 @@ class Joysticks():
 
                     guy.jump(guy.CENTER)
 
-                    ##jump right
-                # for i in range(self.stick.get_numbuttons()):
-                #     # print "button" + self.stick.get_button(i)
-                #     guy.jump()
-

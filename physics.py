@@ -3,6 +3,7 @@
 
 # vec = pg.math.Vector2
 
+# Inputs: player velocity vector, acceleration in x and y direction
 def updateVelocity(vel, ax, ay):
 
     #update vector
