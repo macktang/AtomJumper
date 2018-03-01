@@ -1,2 +1,13 @@
-# Balljumper
-a platformer game built to be playable by both humans and machine learning
+HOW TO SET UP AND RUN PROJECT FROM TERMINAL:
+
+cd into project folder "Balljumper"
+
+in terminal, type "python __main.py__"
+
+
+
+DEPENDENCIES:
+
+
+import pygame
+import random
