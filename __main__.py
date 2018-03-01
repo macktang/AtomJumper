@@ -3,6 +3,8 @@ Mack Tang
 Final Project
 This project is a jumping platformer game that is planned
 to be playable by humans and machine learning
+
+https://github.com/macktang/AtomJumper.git
 '''
 
 
