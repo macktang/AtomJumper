@@ -8,6 +8,8 @@ to be playable by humans and machine learning
 import pygame as pg
 import physics
 
+import settings
+
 #shorten usage of pygame vector object
 vec = pg.math.Vector2
 
@@ -28,22 +30,32 @@ class Player(pg.sprite.Sprite):
     # inputs: game width and height (for spawning in center)
     def __init__(self, width, height):
 
-        self.pos = vec(10,10)
+        self.pos = vec(settings.GAME_WIDTH/2,settings.GAME_HEIGHT*2/3)
         self.vel = vec(0,0)
 
-        pg.sprite.Sprite.__init__(self)
-        self.image = pg.image.load("dude.png")
-        self.rect = self.image.get_rect()
-
-        self.rect.center = self.pos
-
+        # pg.sprite.Sprite.__init__(self)
+        # self.image = pg.image.load("atom_12.png")
+        # self.rect = self.image.get_rect()
+        #
+        # self.rect.center = self.pos
+        #
         self.width = width
         self.height = height
+
+        pg.sprite.Sprite.__init__(self)
+        self.image = pg.Surface((30, 40))
+        self.image.fill(settings.GREEN)
+        self.rect = self.image.get_rect()
+        # self.rect.center = (WIDTH / 2, HEIGHT / 2)
+        # self.pos = vec(WIDTH / 2, HEIGHT / 2)
+        # self.vel = vec(0, 0)
+        # self.acc = vec(0, 0)
 
     # inputs: mode, which can be 0, 1, or 2,
     # which make player jump left, right, or center (straight up)
     def jump(self,mode):
-        self.vel.y = -6.5
+        # self.vel.y = -6.5
+        self.vel.y = -9.5
         direct = 1
         if mode == self.LEFT:
             direct = -1
@@ -63,7 +75,8 @@ class Player(pg.sprite.Sprite):
     # if they move off left or right.
     def update(self):
         # print "about to update velocity"
-        physics.updateVelocity(self.vel, 0, .3)  # gravitational pull
+        physics.updateVelocity(self.vel, 0, .35)  # gravitational pull
+
         # physics.updateVelocity(self.vel, self.vel.x * -0.01, 0) # friction
         # physics.addFriction(self.vel,-0.9)
 

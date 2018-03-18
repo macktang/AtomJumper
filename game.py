@@ -35,6 +35,11 @@ class Game():
         self.screen = pg.display.set_mode(self.size)
         self.running = True
 
+        self.score = 0
+
+    def show_start_screen(self):
+        pass
+
     # instantiates sprite groups
     # instantiates player
     # generates first gate
@@ -44,11 +49,11 @@ class Game():
         self.player = Player(settings.GAME_WIDTH, settings.GAME_HEIGHT)
         self.all_sprites.add(self.player)
 
-        self.lastGate = -50
-        self.GateCount = 0
+        self.player_height = settings.GAME_WIDTH
 
-        self.generateGate(-50)
-        self.generateGate(-50-settings.GAME_WIDTH)
+        self.last_gate_player_height = 0
+
+        self.font_name = pg.font.match_font(settings.FONT_NAME)
 
     # the main game loop
     # reads in keyboard events
@@ -62,35 +67,51 @@ class Game():
             self.update()
             self.draw()
             self.clock.tick(settings.FPS)
+            # self.frameCount += 1
 
     # game update function
     # updates all sprites, checks for collisions
     # scrolls window, deletes old gates
     def update(self):
+        # print self.player_height
+
         self.all_sprites.update()
         hits = pg.sprite.spritecollide(self.player, self.platforms, False)
 
+
         if hits:
-            self.player.pos.y = hits[0].rect.top + 1
-            self.player.vel.y = 0
+            print "collision"
+            self.score = 0
+            self.playing = False
+            # self.player.pos.y = hits[0].rect.top + 1
+            # self.player.vel.y = 0
+            pass
 
         if self.player.rect.top <= settings.GAME_HEIGHT / 2:
             self.player.pos.y += abs(self.player.vel.y)
+            self.player_height += abs(self.player.vel.y)
             for plat in self.platforms:
                 plat.rect.y += abs(self.player.vel.y)
 
                 if plat.rect.top >= settings.GAME_HEIGHT:
                     plat.kill()
+                    self.score += 0.5
 
-                    self.GateCount -= 1
+        if (self.player_height > (self.last_gate_player_height + settings.GAME_WIDTH)):
+            # print "new gate will be generated"
+            self.generateGate(-25)
+            self.last_gate_player_height = self.player_height
 
-                    print self.GateCount
+
+        if self.player.rect.top >= settings.GAME_HEIGHT:
+            self.score = 0
+            self.playing = False
 
     # input: offset to generate gate at
     # this function generates a gate at the specified location
     def generateGate(self, offset):
 
-        randomGateStart = random.randrange(20, settings.GAME_WIDTH - 20 - settings.GATE_WIDTH)
+        randomGateStart = random.randrange(10, settings.GAME_WIDTH - 10 - settings.GATE_WIDTH)
         pa = Plat(0, offset, randomGateStart, 25)
         self.platforms.add(pa)
         self.all_sprites.add(pa)
@@ -100,8 +121,19 @@ class Game():
         self.platforms.add(pb)
         self.all_sprites.add(pb)
 
-        self.GateCount += 2
-        print self.GateCount
+        brick_a_start = random.randrange(randomGateStart,randomGateStart + settings.GATE_WIDTH)
+        brick_a_height = random.randrange(13,13+settings.GATE_WIDTH)
+        ba = Plat(brick_a_start,-25-brick_a_height,13,13)
+        self.platforms.add(ba)
+        self.all_sprites.add(ba)
+        # brick_b_start = random.randrange()
+
+
+
+        # brick_top = Plat()
+
+        # self.GateCount += 2
+        # print self.GateCount
 
 
     # function reads in events
@@ -117,11 +149,20 @@ class Game():
                 self.running = False
                 # sys.exit()
 
-    # draws screen background,
+    # draws screen background, draws score,
     # sprites, and renders display
     def draw(self):
-        self.screen.fill(settings.GRAY)
+        self.screen.fill(settings.WHITE)
 
         self.all_sprites.draw(self.screen)
 
+        self.draw_text(str(int(self.score)),22,settings.BLACK,settings.GAME_WIDTH/2,15)
+
         pg.display.flip()
+
+    def draw_text(self, text, size, color, x, y):
+        font = pg.font.Font(self.font_name, size)
+        text_surface = font.render(text,True,color)
+        text_rect = text_surface.get_rect()
+        text_rect.midtop = (x,y)
+        self.screen.blit(text_surface, text_rect)

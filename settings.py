@@ -9,9 +9,9 @@ to be playable by humans and machine learning
 # that can be imported in
 
 
-GAME_WIDTH = 304
+GAME_WIDTH = 384
 
-GAME_HEIGHT = 540
+GAME_HEIGHT = 683
 
 FPS = 60
 
@@ -23,8 +23,14 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+LIGHT_BLUE = (156,196,252)
+LIGHT_GREEN = (0,155,155)
+PURPLE = (204,0,204)
+ORANGE = (255,153,0)
 
 GRAY = (150, 150, 150)
+
+FONT_NAME = "arial"
 
 # # Starting platforms
 # PLATFORM_LIST = [(0, GAME_HEIGHT - 40, GAME_WIDTH, 40),
