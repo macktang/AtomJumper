@@ -45,6 +45,7 @@ class Game():
 
         self.load_data()
 
+    # loads in wav files from sound folder (snd)
     def load_data(self):
         self.dir = path.dirname(__file__)
         self.snd_dir = path.join(self.dir, 'snd')
@@ -52,7 +53,8 @@ class Game():
         self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Powerup13.wav'))
         self.death_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Explosion6.wav'))
 
-
+    # show the start screen and accompanying text,
+    # pause to wait for user key or mouse press
     def show_start_screen(self):
         self.screen.fill(settings.WHITE)
         self.draw_text("AtomJumper",48,settings.BLACK,settings.GAME_WIDTH/2,settings.GAME_HEIGHT/4)
@@ -61,6 +63,7 @@ class Game():
         pg.display.flip()
         self.wait_for_key()
 
+    # wait for any key to be pressed or mouse click
     def wait_for_key(self):
         waiting = True
         while waiting:
@@ -246,6 +249,7 @@ class Game():
 
         pg.display.flip()
 
+    # draws text at the specified location
     def draw_text(self, text, size, color, x, y):
         font = pg.font.Font(self.font_name, size)
         text_surface = font.render(text,True,color)

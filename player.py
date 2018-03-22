@@ -57,6 +57,7 @@ class Player(pg.sprite.Sprite):
 
         self.player_load_data()
 
+    # loads in player sounds from snd folder
     def player_load_data(self):
         self.dir = path.dirname(__file__)
         self.snd_dir = path.join(self.dir, 'snd')
