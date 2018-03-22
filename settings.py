@@ -13,9 +13,14 @@ GAME_WIDTH = 384
 
 GAME_HEIGHT = 683
 
+SPAWN_HEIGHT = -708
+# -683 - 25
+
 FPS = 60
 
 GATE_WIDTH = GAME_WIDTH / 3
+
+FONT_NAME = 'arial'
 
 # Colors in RGB tuple form
 WHITE = (255, 255, 255)

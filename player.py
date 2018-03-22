@@ -10,6 +10,8 @@ import physics
 
 import settings
 
+from os import path
+
 #shorten usage of pygame vector object
 vec = pg.math.Vector2
 
@@ -24,7 +26,9 @@ class Player(pg.sprite.Sprite):
     RIGHT = 1
     CENTER = 2
     INHERIT = 3
-    JUMPAMOUNT = 1.5
+    # JUMPAMOUNT = 1.5
+    JUMPAMOUNT = 2.0
+
 
     # Constructor
     # inputs: game width and height (for spawning in center)
@@ -43,7 +47,7 @@ class Player(pg.sprite.Sprite):
         self.height = height
 
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.Surface((30, 40))
+        self.image = pg.Surface((25, 25))
         self.image.fill(settings.GREEN)
         self.rect = self.image.get_rect()
         # self.rect.center = (WIDTH / 2, HEIGHT / 2)
@@ -51,11 +55,21 @@ class Player(pg.sprite.Sprite):
         # self.vel = vec(0, 0)
         # self.acc = vec(0, 0)
 
+        self.player_load_data()
+
+    def player_load_data(self):
+        self.dir = path.dirname(__file__)
+        self.snd_dir = path.join(self.dir, 'snd')
+        # self.coin_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Pickup_Coin18.wav'))
+        self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Jump3_low_volume.wav'))
+        # self.death_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Explosion6.wav'))
+
     # inputs: mode, which can be 0, 1, or 2,
     # which make player jump left, right, or center (straight up)
     def jump(self,mode):
+
         # self.vel.y = -6.5
-        self.vel.y = -9.5
+        self.vel.y = -10.5
         direct = 1
         if mode == self.LEFT:
             direct = -1
@@ -64,6 +78,8 @@ class Player(pg.sprite.Sprite):
         # elif mode == self.INHERIT:
         #     direct =
         self.vel.x = self.JUMPAMOUNT * direct
+        # self.jump_sound.play()
+        # removed jump sound for now due to inability to play sounds quickly after another
 
     # returns player velocity vector
     def getSpeed(self):
@@ -75,7 +91,7 @@ class Player(pg.sprite.Sprite):
     # if they move off left or right.
     def update(self):
         # print "about to update velocity"
-        physics.updateVelocity(self.vel, 0, .35)  # gravitational pull
+        physics.updateVelocity(self.vel, 0, .4)  # gravitational pull
 
         # physics.updateVelocity(self.vel, self.vel.x * -0.01, 0) # friction
         # physics.addFriction(self.vel,-0.9)

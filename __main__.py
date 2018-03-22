@@ -14,8 +14,16 @@ from game import Game
 
 g = Game()
 g.show_start_screen()
-while g.running:
-    g.new()
-    g.run()
+
+if g.bot_active == False:
+    while g.running:
+        g.new()
+        g.run()
+
+elif g.bot_active == True:
+    print "bot will play"
+    while g.running:
+        g.new()
+        g.run()
 
 pg.quit()
