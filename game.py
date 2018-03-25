@@ -6,7 +6,7 @@ to be playable by humans and machine learning
 '''
 
 import pygame as pg
-import settings
+from settings import *
 from inputs.joystick import Joysticks
 from player import Player
 from inputs import keyboard
@@ -16,6 +16,8 @@ from plat import Plat
 import random
 
 from os import path
+
+from collections import deque
 
 
 # The game class is used to take off some of the work from
@@ -31,19 +33,21 @@ class Game():
     def __init__(self):
 
         pg.init()
-        self.size = [settings.GAME_WIDTH, settings.GAME_HEIGHT]
+        self.size = [WIDTH, HEIGHT]
         self.clock = pg.time.Clock()
         self.sticks = Joysticks()
         self.screen = pg.display.set_mode(self.size)
         self.running = True
 
-        self.font_name = pg.font.match_font(settings.FONT_NAME)
+        self.font_name = pg.font.match_font(FONT_NAME)
 
         self.score = 0
 
         self.bot_active = False # store whether bot or human will play
 
         self.load_data()
+
+        self.d = deque()
 
     # loads in wav files from sound folder (snd)
     def load_data(self):
@@ -56,10 +60,10 @@ class Game():
     # show the start screen and accompanying text,
     # pause to wait for user key or mouse press
     def show_start_screen(self):
-        self.screen.fill(settings.WHITE)
-        self.draw_text("AtomJumper",48,settings.BLACK,settings.GAME_WIDTH/2,settings.GAME_HEIGHT/4)
-        self.draw_text("Use left and right arrows to move",22,settings.BLACK,settings.GAME_WIDTH/2,settings.GAME_HEIGHT/2)
-        self.draw_text("press any key to play! or Click Mouse to activate bot",22,settings.BLACK,settings.GAME_WIDTH/2,settings.GAME_HEIGHT*3/4)
+        self.screen.fill(WHITE)
+        self.draw_text("AtomJumper", 48, BLACK, WIDTH / 2, HEIGHT / 4)
+        self.draw_text("Use left and right arrows to move", 22, BLACK, WIDTH / 2, HEIGHT / 2)
+        self.draw_text("press any key to play! or Click Mouse to activate bot", 22, BLACK, WIDTH / 2, HEIGHT * 3 / 4)
         pg.display.flip()
         self.wait_for_key()
 
@@ -67,7 +71,7 @@ class Game():
     def wait_for_key(self):
         waiting = True
         while waiting:
-            self.clock.tick(settings.FPS)
+            self.clock.tick(FPS)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     waiting = False
@@ -87,14 +91,16 @@ class Game():
         self.all_sprites = pg.sprite.Group()
         self.platforms = pg.sprite.Group()
         self.scoring = pg.sprite.Group()
-        self.player = Player(settings.GAME_WIDTH, settings.GAME_HEIGHT)
+        self.player = Player(WIDTH, HEIGHT)
         self.all_sprites.add(self.player)
 
-        self.player_height = settings.GAME_WIDTH
+        self.player_height = WIDTH
 
         self.last_gate_player_height = 0
 
-        self.font_name = pg.font.match_font(settings.FONT_NAME)
+        self.font_name = pg.font.match_font(FONT_NAME)
+
+        self.genFirstGate(-40)
 
     # the main game loop
     # reads in keyboard events
@@ -105,7 +111,9 @@ class Game():
         self.playing = True
 
         if self.bot_active == True:
-            self.center_future = 0
+            # self.center_future = 0
+            # self.d.append(-1)
+            # print list(self.d)
             while self.playing:
                 # will leave event listener on, so timing is same.
                 # human player could disrupt bot, but is not meant to
@@ -114,7 +122,7 @@ class Game():
                 # print "db passed bot event handler"
                 self.update()
                 self.draw()
-                self.clock.tick(settings.FPS)
+                self.clock.tick(FPS)
                 # put bot code here!
 
         elif self.bot_active == False:
@@ -122,7 +130,7 @@ class Game():
                 self.events()
                 self.update()
                 self.draw()
-                self.clock.tick(settings.FPS)
+                self.clock.tick(FPS)
                 # self.frameCount += 1
 
     # function reads in events
@@ -140,15 +148,15 @@ class Game():
 
     # event handler for the bot, replaces keyboard event listener
     def bot_events(self):
-        if (self.center_future != 0):
-            # if self.player.pos.y >= (settings.GAME_HEIGHT - 270):
-                if self.player.pos.x >= self.center_future:
+        if (self.d[0] != -1): # if the leftmost item is not equal to -1
+            # if self.player.pos.y >= (HEIGHT - 270):
+                if self.player.rect.centerx >= self.d[0]:
                     self.player.jump(self.player.LEFT)
-                elif self.player.pos.x < self.center_future:
+                elif self.player.rect.centerx < self.d[0]:
                     self.player.jump(self.player.RIGHT)
 
         else:
-            # if self.player.pos.y >= (settings.GAME_HEIGHT - 270):
+            # if self.player.pos.y >= (HEIGHT - 270):
                 self.player.jump(self.player.LEFT)
 
     # game update function
@@ -161,91 +169,113 @@ class Game():
         hits = pg.sprite.spritecollide(self.player, self.platforms, False)
 
 
-
-
         if hits:
-            print "collision"
+            # print "collision"
             self.score = 0
             self.death_sound.play()
+            self.d.clear()
             self.playing = False
             # self.player.pos.y = hits[0].rect.top + 1
             # self.player.vel.y = 0
 
-        if self.player.rect.top <= settings.GAME_HEIGHT / 2:
+        if self.player.rect.top <= HEIGHT / 2:
             self.player.pos.y += abs(self.player.vel.y)
             self.player_height += abs(self.player.vel.y)
 
             # for s in self.scoring:
-            #     if s.rect.top >= settings.GAME_HEIGHT:
+            #     if s.rect.top >= HEIGHT:
             #         self.score += 1
 
             for plat in self.platforms:
                 plat.rect.y += abs(self.player.vel.y)
 
-                if plat.rect.top >= settings.GAME_HEIGHT:
-                    if pg.sprite.Group.has(self.scoring,plat):
-                        self.score += 1
-                        self.coin_sound.play()
-
+                if plat.rect.top >= HEIGHT:
                     plat.kill()
 
+        for plat_score in self.scoring:
+            if self.player.rect.bottom <= plat_score.rect.top:
+                self.score += 1
+                try:
+                    self.d.popleft() #update bot aim to the next gate
+                except IndexError:
+                    print "tried to pop from an empty deque, supressing error"
+                self.coin_sound.play()
+                self.scoring.remove(plat_score)
 
-        if (self.player_height > (self.last_gate_player_height + settings.GAME_WIDTH)):
+
+                # if plat.rect.top >= HEIGHT:
+                #     if pg.sprite.Group.has(self.scoring,plat):
+                #         self.score += 1
+                #         self.coin_sound.play()
+                #
+                #     plat.kill()
+
+
+        if (self.player_height > (self.last_gate_player_height + WIDTH)):
             # print "new gate will be generated"
-            self.generateGate(settings.SPAWN_HEIGHT)
+            self.generateGate(SPAWN_HEIGHT)
             self.last_gate_player_height = self.player_height
 
 
-        if self.player.rect.top >= settings.GAME_HEIGHT:
+        if self.player.rect.top >= HEIGHT:
             self.score = 0
+            self.d.clear()
             self.playing = False
 
     # input: offset to generate gate at
     # this function generates a gate at the specified location
     def generateGate(self, offset):
 
-        randomGateStart = random.randrange(10, settings.GAME_WIDTH - 10 - settings.GATE_WIDTH)
+        randomGateStart = random.randrange(10, WIDTH - 10 - GATE_WIDTH)
         pa = Plat(0, offset, randomGateStart, 40)
         self.platforms.add(pa)
         self.scoring.add(pa)
         self.all_sprites.add(pa)
 
-        self.center_future = randomGateStart + settings.GATE_WIDTH/2
+        # self.center_future = randomGateStart + GATE_WIDTH/2
+        self.d.append(randomGateStart + GATE_WIDTH/2)
 
-        pb = Plat(randomGateStart + settings.GATE_WIDTH, offset,
-                  settings.GAME_WIDTH - settings.GATE_WIDTH - randomGateStart, 40)
+        pb = Plat(randomGateStart + GATE_WIDTH, offset,
+                  WIDTH - GATE_WIDTH - randomGateStart, 40)
         self.platforms.add(pb)
-        # self.scoring.add(pb)
         self.all_sprites.add(pb)
 
-        brick_a_start = random.randrange(randomGateStart,randomGateStart + settings.GATE_WIDTH)
-        brick_a_height = random.randrange(13,13+settings.GATE_WIDTH)
-        ba = Plat(brick_a_start,settings.SPAWN_HEIGHT-brick_a_height,25,25) #generate brick between 13 to gate height up
+        brick_a_start = random.randrange(randomGateStart,randomGateStart + GATE_WIDTH)
+        brick_a_height = random.randrange(13,13+GATE_WIDTH)
+        ba = Plat(brick_a_start,SPAWN_HEIGHT-brick_a_height,25,25) #generate brick between 13 to gate height up
         self.platforms.add(ba)
         self.all_sprites.add(ba)
-        # brick_b_start = random.randrange()
 
-        brick_b_start = random.randrange(randomGateStart,randomGateStart + settings.GATE_WIDTH)
-        brick_b_height = random.randrange(randomGateStart,randomGateStart + settings.GATE_WIDTH)
-        bb = Plat(brick_b_start,settings.SPAWN_HEIGHT+brick_b_height,25,25)
+        brick_b_start = random.randrange(randomGateStart,randomGateStart + GATE_WIDTH)
+        brick_b_height = random.randrange(randomGateStart,randomGateStart + GATE_WIDTH)
+        bb = Plat(brick_b_start,SPAWN_HEIGHT+brick_b_height,25,25)
         self.platforms.add(bb)
         self.all_sprites.add(bb)
 
+    def genFirstGate(self,offset):
+        randomGateStart = random.randrange(10, WIDTH - 10 - GATE_WIDTH)
+        pa = Plat(0, offset, randomGateStart, 40)
+        self.platforms.add(pa)
+        self.scoring.add(pa)
+        self.all_sprites.add(pa)
 
+        # self.center_future = randomGateStart + GATE_WIDTH/2
+        self.d.append(randomGateStart + GATE_WIDTH/2)
+        # self.d.popleft() #delete initial "-1" in queue
 
-        # brick_top = Plat()
-
-        # self.GateCount += 2
-        # print self.GateCount
+        pb = Plat(randomGateStart + GATE_WIDTH, offset,
+                  WIDTH - GATE_WIDTH - randomGateStart, 40)
+        self.platforms.add(pb)
+        self.all_sprites.add(pb)
 
     # draws screen background, draws score,
     # sprites, and renders display
     def draw(self):
-        self.screen.fill(settings.WHITE)
+        self.screen.fill(WHITE)
 
         self.all_sprites.draw(self.screen)
 
-        self.draw_text(str(int(self.score)),22,settings.BLACK,settings.GAME_WIDTH/2,15)
+        self.draw_text(str(int(self.score)), 22, BLACK, WIDTH / 2, 15)
 
         pg.display.flip()
 
