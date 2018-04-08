@@ -211,6 +211,7 @@ class Game():
         self.all_sprites.add(pa)
 
         self.center_future = randomGateStart + settings.GATE_WIDTH/2
+        print "gate center target updated"
 
         pb = Plat(randomGateStart + settings.GATE_WIDTH, offset,
                   settings.GAME_WIDTH - settings.GATE_WIDTH - randomGateStart, 40)
