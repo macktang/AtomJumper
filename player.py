@@ -34,7 +34,7 @@ class Player(pg.sprite.Sprite):
     # inputs: game width and height (for spawning in center)
     def __init__(self, width, height):
 
-        self.pos = vec(settings.GAME_WIDTH/2,settings.GAME_HEIGHT*2/3)
+        self.pos = vec(settings.WIDTH / 2, settings.HEIGHT * 2 / 3)
         self.vel = vec(0,0)
 
         # pg.sprite.Sprite.__init__(self)

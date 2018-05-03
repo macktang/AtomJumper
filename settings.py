@@ -9,16 +9,16 @@ to be playable by humans and machine learning
 # that can be imported in
 
 
-GAME_WIDTH = 384
+WIDTH = 384
 
-GAME_HEIGHT = 683
+HEIGHT = 683
 
 SPAWN_HEIGHT = -708
 # -683 - 25
 
 FPS = 60
 
-GATE_WIDTH = GAME_WIDTH / 3
+GATE_WIDTH = WIDTH / 3
 
 FONT_NAME = 'arial'
 
@@ -35,11 +35,9 @@ ORANGE = (255,153,0)
 
 GRAY = (150, 150, 150)
 
-FONT_NAME = "arial"
-
 # # Starting platforms
-# PLATFORM_LIST = [(0, GAME_HEIGHT - 40, GAME_WIDTH, 40),
-#                  (GAME_WIDTH / 2 - 50, GAME_HEIGHT * 3 / 4, 100, 20),
-#                  (125, GAME_HEIGHT - 350, 100, 20),
+# PLATFORM_LIST = [(0, HEIGHT - 40, WIDTH, 40),
+#                  (WIDTH / 2 - 50, HEIGHT * 3 / 4, 100, 20),
+#                  (125, HEIGHT - 350, 100, 20),
 #                  (350, 200, 100, 20),
 #                  (175, 100, 50, 20)]
